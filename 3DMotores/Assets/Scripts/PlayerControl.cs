@@ -7,12 +7,18 @@ using UnityEngine.UIElements;
 
 public class PlayerControl : MonoBehaviour
 {
+    [Header("Atributos")]
     public float speed;
+    public float gravity;
+    public float damage = 20;
+    
+    [Header("Combonentes")]
     private CharacterController charCtrl;
-    private Animator anim;
     private Transform cam;
     private Vector3 moveDirection;
-    public float gravity;
+    private Animator anim;
+    
+    [Header("Others")]
     public float smoothRotTime;
     private float turnSmoothVelocity;
     public float colliderRadius;
@@ -103,7 +109,12 @@ public class PlayerControl : MonoBehaviour
         
         foreach (Transform enems in enemyList)
         {
-            Debug.Log(enems.name);
+            CombatEnemy enemy = GetComponent<CombatEnemy>();
+
+            if (enemy != null)
+            {
+                enemy.GetHit(damage);
+            }
         }
 
         yield return new WaitForSeconds(1.25f);
