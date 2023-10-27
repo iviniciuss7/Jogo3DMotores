@@ -38,7 +38,9 @@ public class CombatEnemy : MonoBehaviour
     
     void Update()
     {
-        float distance = Vector3.Distance(target.position, transform.position);
+        if (totalHealth >0)
+        {
+            float distance = Vector3.Distance(target.position, transform.position);
 
         if (distance <= lookRadius)
         {
@@ -72,6 +74,7 @@ public class CombatEnemy : MonoBehaviour
             walking = false;
             attacking = false;
         }
+        }
     }
 
     private void OnDrawGizmosSelected()
@@ -82,7 +85,7 @@ public class CombatEnemy : MonoBehaviour
 
     private IEnumerator AttackEnemy()
     {
-        if (!waitFor)
+        if (!waitFor && !hiting)
         {
             waitFor = true;
             attacking = true;
@@ -119,11 +122,12 @@ public class CombatEnemy : MonoBehaviour
             StopCoroutine("AttackEnemy");
             animEnemy.SetTrigger("Take Damage");
             hiting = true;
+            StartCoroutine("RecoveryHit");
         }
 
         else
         {
-            animEnemy.SetTrigger("Die");
+            animEnemy.SetTrigger("Die"); 
         }
     }
 
