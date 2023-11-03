@@ -38,7 +38,7 @@ public class CombatEnemy : MonoBehaviour
     
     void Update()
     {
-        if (totalHealth >0)
+        if (totalHealth > 0)
         {
             float distance = Vector3.Distance(target.position, transform.position);
 
