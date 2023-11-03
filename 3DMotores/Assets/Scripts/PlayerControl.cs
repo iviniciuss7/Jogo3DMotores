@@ -107,7 +107,7 @@ public class PlayerControl : MonoBehaviour
             
         GetEnemiesList();
         
-        foreach (Transform enems in enemyList)
+        foreach (Transform enemys in enemyList)
         {
             CombatEnemy enemy = GetComponent<CombatEnemy>();
 

@@ -75,7 +75,7 @@ public class CombatEnemy : MonoBehaviour
             attacking = false;
         }
         }
-    }
+     }
 
     private void OnDrawGizmosSelected()
     {
@@ -95,7 +95,8 @@ public class CombatEnemy : MonoBehaviour
         
             yield return new WaitForSeconds(1.2f);
             GetPlayer();
-            //yield return new WaitForSeconds(1f);
+                
+            yield return new WaitForSeconds(1f);
             waitFor = false;
         }
         
@@ -117,6 +118,7 @@ public class CombatEnemy : MonoBehaviour
     public void GetHit(float damage)
     {
         totalHealth -= damage;
+                
         if (totalHealth > 0)
         {
             StopCoroutine("AttackEnemy");
