@@ -11,8 +11,9 @@ public class PlayerControl : MonoBehaviour
     public float speed;
     public float gravity;
     public float damage = 20;
+    public int healthPlayer = 100;
     
-    [Header("Combonentes")]
+    [Header("Componentes")]
     private CharacterController charCtrl;
     private Transform cam;
     private Vector3 moveDirection;
@@ -24,9 +25,13 @@ public class PlayerControl : MonoBehaviour
     public float colliderRadius;
     public List<Transform> enemyList = new List<Transform>();
     public bool isWalking;
+    public bool waitFor;
+    public bool isHitting;
+    public bool isDead;
 
     void Start()
     {
+        GameController.instance.UpdateLives(healthPlayer);
         charCtrl = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
         cam = Camera.main.transform;
@@ -35,12 +40,17 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move();
+        if (!isDead){
+         Move();
         GetMouseInput();
+        }
+     
     }
+
+
     void Move()
     {
-        if (charCtrl.isGrounded)
+        if (charCtrl.isGrounded && isDead)
         { 
             float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -101,26 +111,29 @@ public class PlayerControl : MonoBehaviour
 
     IEnumerator Attack()
     {
-        anim.SetBool("attacking", true);
-        anim.SetInteger("transition", 2);
-        yield return new WaitForSeconds(0.5f);
+        if (!waitFor && !isHitting){
+            waitFor = true;
+            anim.SetBool("attacking", true);
+            anim.SetInteger("transition", 2);
+            yield return new WaitForSeconds(0.5f);
             
-        GetEnemiesList();
+            GetEnemiesList();
         
-        foreach (Transform enemys in enemyList)
-        {
-            CombatEnemy enemy = GetComponent<CombatEnemy>();
+            foreach (Transform enemys in enemyList){
+                CombatEnemy enemy = GetComponent<CombatEnemy>();
 
-            if (enemy != null)
-            {
-                enemy.GetHit(damage);
-            }
+                if (enemy != null)
+                {
+                    enemy.GetHit(damage);
+                }
+            } 
+            yield return new WaitForSeconds(1.25f);
+        
+            anim.SetInteger("transition", 0);
+            anim.SetBool("attacking", false);
+            waitFor = false;
+
         }
-
-        yield return new WaitForSeconds(1.25f);
-        
-        anim.SetInteger("transition", 0);
-        anim.SetBool("attacking", false);
     }
 
     void GetEnemiesList()
@@ -135,9 +148,33 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
+    public void GetHit(int damage){
+        healthPlayer -= damage;
+
+        if(healthPlayer > 0){
+            StopCoroutine("Attack");
+            anim.SetInteger("transition", 3);
+            isHitting = true;
+            StartCoroutine("RecoveryFromHit");
+        }
+        
+        else{
+            isDead = true;
+            anim.SetTrigger("Die");
+        }
+    }
+
+    IEnumerator RecoveryFromHit(){
+        yield return new WaitForSeconds(1f);
+        anim.SetInteger("transition", 0);
+        isHitting = false;
+        anim.SetBool("attacking", false); 
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + transform.forward, colliderRadius);
     }
+
 }

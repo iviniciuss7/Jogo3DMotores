@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TextCore.Text;
+using Random = System.Random;
 
 public class CombatEnemy : MonoBehaviour
 {
     [Header("Atributos")]
     public float totalHealth = 100;
-    public float attackDamage;
+    public int attackDamage;
     public float speedMove;
     public float lookRadius;
     public float colliderRadius = 2f;
@@ -25,6 +26,12 @@ public class CombatEnemy : MonoBehaviour
     private bool attacking;
     private bool waitFor;
     private bool hiting;
+    private bool playerIsDead;
+
+    [Header("WayPoints")]
+    public List<Transform> wayPoint = new List <Transform>();
+    public int currentPathIndex;
+    public float pathDistance;
     
     
     void Start()
@@ -69,13 +76,14 @@ public class CombatEnemy : MonoBehaviour
 
         else
         {
-            navEnemy.isStopped = true;
+            //navEnemy.isStopped = true;
             animEnemy.SetBool("Walk Forward", false);
             walking = false;
             attacking = false;
+            MoveToWayPoint();
         }
-        }
-     }
+        } 
+    }
 
     private void OnDrawGizmosSelected()
     {
@@ -83,9 +91,23 @@ public class CombatEnemy : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, lookRadius);
     }
 
+    void MoveToWayPoint(){
+        if (wayPoint.Count > 0){ 
+            float distance = Vector3.Distance(wayPoint[currentPathIndex].position, transform.position);
+            navEnemy.destination = wayPoint[currentPathIndex].position;
+            
+            if (distance <= pathDistance){
+                //currentPathIndex = (0, wayPoint.Count);
+            } 
+            animEnemy.SetBool("Walk Forward", true);
+            walking = true;
+        }
+
+    }
+
     private IEnumerator AttackEnemy()
     {
-        if (!waitFor && !hiting)
+        if (!waitFor && !hiting  && !playerIsDead)
         {
             waitFor = true;
             attacking = true;
@@ -96,10 +118,16 @@ public class CombatEnemy : MonoBehaviour
             yield return new WaitForSeconds(1.2f);
             GetPlayer();
                 
-            yield return new WaitForSeconds(1f);
+           // yield return new WaitForSeconds(1f);
             waitFor = false;
         }
-        
+        if (playerIsDead){
+            animEnemy.SetBool("Walk Forward", false);
+            animEnemy.SetBool("Bite Attack", false);
+            walking = false;
+            attacking = false;
+            navEnemy.isStopped = true;
+        }
         
     }
 
@@ -109,8 +137,8 @@ public class CombatEnemy : MonoBehaviour
         {
             if (coll.gameObject.CompareTag("Player"))
             {
-                //dano no player
-                Debug.Log("Bateu");
+                coll.gameObject.GetComponent<PlayerControl>().GetHit(attackDamage);
+               playerIsDead = coll.gameObject.GetComponent<PlayerControl>().isDead;
             }
         }
     }
@@ -142,4 +170,5 @@ public class CombatEnemy : MonoBehaviour
         waitFor = false;
 
     }
+
 }
