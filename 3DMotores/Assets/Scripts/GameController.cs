@@ -19,7 +19,7 @@ public class GameController : MonoBehaviour{
    
 
     public void UpdateScore(int value){
-        scoreCoin =+ value;
+        scoreCoin += value;
         scoreText.text = scoreCoin.ToString();
     }
 

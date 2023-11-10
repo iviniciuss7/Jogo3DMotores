@@ -18,6 +18,9 @@ public class PlayerControl : MonoBehaviour
     private Transform cam;
     private Vector3 moveDirection;
     private Animator anim;
+    public AudioSource srcPlayer;
+    public AudioClip clipP1;
+    public AudioClip clipP2;
     
     [Header("Others")]
     public float smoothRotTime;
@@ -42,19 +45,20 @@ public class PlayerControl : MonoBehaviour
     {
         if (!isDead){
          Move();
-        GetMouseInput();
+         GetMouseInput();
         }
      
     }
 
 
-    void Move()
-    {
-        if (charCtrl.isGrounded && isDead)
+    void Move(){
+        
+        if (charCtrl.isGrounded)
         { 
             float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical);
+            float vertical = Input.GetAxisRaw("Vertical");
+            Vector3 direction = new Vector3(horizontal, 0f, vertical);
+            
 
         if (direction.magnitude > 0)
         {
@@ -104,6 +108,7 @@ public class PlayerControl : MonoBehaviour
                 if (!anim.GetBool("walking"))
                 {
                     StartCoroutine("Attack");
+                    srcPlayer.PlayOneShot(clipP2);
                 }
             }
         }
@@ -144,6 +149,7 @@ public class PlayerControl : MonoBehaviour
             if (coll.gameObject.CompareTag("Enemy"))
             {
                 enemyList.Add(coll.transform);
+                //GetHit();
             }
         }
     }

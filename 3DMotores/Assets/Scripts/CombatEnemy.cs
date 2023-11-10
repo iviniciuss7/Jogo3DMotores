@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.TextCore.Text;
-using Random = System.Random;
 
 public class CombatEnemy : MonoBehaviour
 {
     [Header("Atributos")]
-    public float totalHealth = 100;
+    public float totalHealth = 40;
     public int attackDamage;
     public float speedMove;
     public float lookRadius;
@@ -97,7 +96,7 @@ public class CombatEnemy : MonoBehaviour
             navEnemy.destination = wayPoint[currentPathIndex].position;
             
             if (distance <= pathDistance){
-                //currentPathIndex = (0, wayPoint.Count);
+                currentPathIndex = UnityEngine.Random.Range(0, wayPoint.Count); 
             } 
             animEnemy.SetBool("Walk Forward", true);
             walking = true;
